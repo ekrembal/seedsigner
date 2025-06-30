@@ -186,6 +186,11 @@ class PSBTParser():
             if self.psbt.tx.vout[i].script_pubkey.data[0] == OPCODES.OP_RETURN:
                 # The data is written as: OP_RETURN + OP_PUSHDATA1 + len(payload) + payload
                 self.op_return_data = self.psbt.tx.vout[i].script_pubkey.data[3:]
+            
+            if self.psbt.tx.vout[i].script_pubkey.data == b"\x51\x02\x4e\x73":
+                self.destination_addresses.append("Anchor Output")
+                self.destination_amounts.append(self.psbt.tx.vout[i].value)
+                self.spend_amount += self.psbt.tx.vout[i].value
 
             elif is_change:
                 addr = self.psbt.tx.vout[i].script_pubkey.address(NETWORKS[SettingsConstants.map_network_to_embit(self.network)])
