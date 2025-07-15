@@ -761,6 +761,9 @@ class PSBTOpReturnScreen(ButtonListScreen):
 
 @dataclass
 class PSBTFinalizeScreen(ButtonListScreen):
+    psbt_hash: str = None
+    psbt_sighashes: str = None
+
     def __post_init__(self):
         # Customize defaults
         self.title = _("Sign PSBT")
@@ -777,6 +780,6 @@ class PSBTFinalizeScreen(ButtonListScreen):
         self.components.append(icon)
 
         self.components.append(TextArea(
-            text=_("Click to approve this transaction"),
+            text=_("Approve {}\nsighashes: {}").format(self.psbt_hash, self.psbt_sighashes),
             screen_y=icon.screen_y + icon.height + 2*GUIConstants.COMPONENT_PADDING
         ))

@@ -7,7 +7,6 @@ from seedsigner.gui.screens.screen import (RET_CODE__BACK_BUTTON, ButtonListScre
 from seedsigner.views.view import BackStackView, MainMenuView, NotYetImplementedView, View, Destination
 
 
-
 class PSBTSelectSeedView(View):
     SCAN_SEED = ButtonOption("Scan a seed", SeedSignerIconConstants.QRCODE)
     TYPE_12WORD = ButtonOption("Enter 12-word seed", FontAwesomeIconConstants.KEYBOARD)
@@ -516,6 +515,7 @@ class PSBTFinalizeView(View):
 
     
     def run(self):
+        from hashlib import sha256
         from embit.psbt import PSBT
         from seedsigner.gui.screens.psbt_screens import PSBTFinalizeScreen
 
@@ -526,9 +526,15 @@ class PSBTFinalizeView(View):
             # Should not be able to get here
             return Destination(MainMenuView)
         
+        psbt_hash = sha256(psbt.to_string().encode()).hexdigest()
+        psbt_sighashes = [input.sighash_type for input in psbt.inputs]
+        psbt_sighashes_str = " ".join([f"{i}: {sighash}" for i, sighash in enumerate(psbt_sighashes)])
+
         selected_menu_num = self.run_screen(
             PSBTFinalizeScreen,
-            button_data=[self.APPROVE_PSBT]
+            button_data=[self.APPROVE_PSBT],
+            psbt_hash=psbt_hash,
+            psbt_sighashes=psbt_sighashes_str,
         )
 
         if selected_menu_num == RET_CODE__BACK_BUTTON:
